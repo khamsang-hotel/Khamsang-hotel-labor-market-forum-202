@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Khamsang Hotel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #333;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+    }
+    nav {
+      background: #444;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 15px;
+      text-decoration: none;
+    }
+    main {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+    }
+    .stars {
+      direction: rtl;
+      display: inline-flex;
+    }
+    .stars input {
+      display: none;
+    }
+    .stars label {
+      font-size: 2rem;
+      color: #ccc;
+      cursor: pointer;
+    }
+    .stars input:checked ~ label,
+    .stars label:hover,
+    .stars label:hover ~ label {
+      color: #f5b301;
+    }
+    .review-form textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    .review-form button {
+      background: #333;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .reviews {
+      margin-top: 2rem;
+    }
+    .review {
+      background: #f9f9f9;
+      border-left: 4px solid #333;
+      padding: 10px 15px;
+      margin-bottom: 1rem;
+    }
+    .rating-summary {
+      margin-top: 30px;
+    }
+    .rating-bar {
+      height: 8px;
+      background: #ddd;
+      margin-top: 4px;
+      position: relative;
+    }
+    .bar-fill {
+      background: #f5b301;
+      height: 100%;
+    }
+    .thank-you {
+      background: #4caf50;
+      color: white;
+      padding: 10px;
+      margin-top: 10px;
+      text-align: center;
+      border-radius: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="Khamsang Hotel Logo" style="height: 50px;">
+    <h1>Khamsang Hotel</h1>
+    <p>Delivering Excellence in Hospitality</p>
+  </header>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a href="#job">Job Application</a>
+    <a href="#institute">Institute Application</a>
+    <a href="#feedback">Feedback</a>
+  </nav>
+
+  <main>
+    <section id="home">
+      <h2>Welcome</h2>
+      <p>We are a dynamic hotel committed to exceptional guest experiences by partnering with institutions and seeking talented individuals to join our team.</p>
+    </section>
+
+    <section id="about">
+      <h2>About Us</h2>
+      <p>Our goal is to create a skilled workforce that ensures top-notch service and satisfaction for every guest.</p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <p>Phone: 17754628</p>
+      <p>Email: <a href="mailto:khamsanghotel907@gmail.com">khamsanghotel907@gmail.com</a></p>
+    </section>
+
+    <section id="job">
+      <h2>Job Application (Independent Candidates)</h2>
+      <div class="form-link">
+        <a href="https://forms.gle/K27eQ7RGRKAWzBpC7" target="_blank">Apply via Google Form</a>
+      </div>
+    </section>
+
+    <section id="institute">
+      <h2>Training Institute Internship Application</h2>
+      <div class="form-link">
+        <a href="https://forms.gle/WD189RAAKN9iddyh6" target="_blank">Submit Internship Application</a>
+      </div>
+    </section>
+
+    <section id="feedback">
+      <h2>Leave a Rating</h2>
+      <form id="feedbackForm" class="review-form">
+        <div class="stars">
+          <input type="radio" name="rating" id="star5" value="5"><label for="star5">&#9733;</label>
+          <input type="radio" name="rating" id="star4" value="4"><label for="star4">&#9733;</label>
+          <input type="radio" name="rating" id="star3" value="3"><label for="star3">&#9733;</label>
+          <input type="radio" name="rating" id="star2" value="2"><label for="star2">&#9733;</label>
+          <input type="radio" name="rating" id="star1" value="1"><label for="star1">&#9733;</label>
+        </div>
+        <br/>
+        <textarea id="reviewText" placeholder="Write your feedback..." required></textarea>
+        <br/>
+        <button type="submit">Submit Feedback</button>
+        <div id="thankYouMessage" class="thank-you">Thank you for your feedback!</div>
+      </form>
+
+      <div class="rating-summary">
+        <h3>Average Rating:</h3>
+        <div>
+          <div id="averageRating" style="font-size: 2rem;">0.0 ★</div>
+          <div id="ratingCounts"></div>
+        </div>
+      </div>
+
+      <section class="reviews">
+        <h2>Customer Reviews</h2>
+        <div id="reviewsContainer"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Khamsang Hotel. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const SHEETDB_API = 'https://sheetdb.io/api/v1/kzyvg1cvvcoqf';
+
+    document.getElementById('feedbackForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const rating = document.querySelector('input[name="rating"]:checked')?.value;
+      const review = document.getElementById('reviewText').value.trim();
+
+      if (!rating || !review) {
+        alert('Please select a rating and enter a review.');
+        return;
+      }
+
+      const data = {
+        rating: rating,
+        review: review,
+        date: new Date().toISOString().split('T')[0]
+      };
+
+      await fetch(SHEETDB_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data })
+      });
+
+      // Show popup appreciation
+      alert('Thank you for your feedback! We appreciate your time.');
+
+      // Show on-page thank-you message
+      const thankYouDiv = document.getElementById('thankYouMessage');
+      thankYouDiv.style.display = 'block';
+
+      setTimeout(() => {
+        thankYouDiv.style.display = 'none';
+      }, 3000);
+
+      document.getElementById('feedbackForm').reset();
+      loadReviews();
+    });
+
+    async function loadReviews() {
+      const res = await fetch(SHEETDB_API);
+      const reviews = await res.json();
+
+      const container = document.getElementById('reviewsContainer');
+      container.innerHTML = '';
+
+      let sum = 0;
+      let counts = [0, 0, 0, 0, 0];
+
+      reviews.forEach(r => {
+        const rating = parseInt(r.rating);
+        sum += rating;
+        counts[rating - 1]++;
+
+        const div = document.createElement('div');
+        div.className = 'review';
+        div.innerHTML = `
+          <strong>${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</strong>
+          <p>${r.review}</p>
+          <small>${r.date}</small>
+        `;
+        container.appendChild(div);
+      });
+
+      const avg = (sum / reviews.length).toFixed(1);
+      document.getElementById('averageRating').textContent = `${avg} ★`;
+
+      const total = reviews.length;
+      const countsHTML = counts.map((c, i) => {
+        const percent = total ? ((c / total) * 100).toFixed(1) : 0;
+        return `
+          <div>
+            <strong>${5 - i} stars</strong>
+            <div class="rating-bar"><div class="bar-fill" style="width:${percent}%;"></div></div>
+          </div>
+        `;
+      }).reverse().join('');
+
+      document.getElementById('ratingCounts').innerHTML = countsHTML;
+    }
+
+    loadReviews();
+  </script>
+</body>
+</html>
